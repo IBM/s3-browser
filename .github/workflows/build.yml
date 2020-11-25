@@ -1,0 +1,26 @@
+name: build
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+#      - name: Update pip
+#        run: pip3 install --upgrade pip
+
+      - name: Check python3 location
+        run: echo $PATH; which python3
+
+      - name: Install test requirements
+        run: pip3 install -r requirements_test.txt
+
+      - name: Build
+        run: ./build.sh
+        env:
+          TERM: xterm-256color
