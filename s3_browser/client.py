@@ -12,8 +12,8 @@ class S3Client(object):
     the boto s3 client and adding memoisation and a more concise and path-like
     API
     """
-    def __init__(self, debug=False):
-        self.boto = boto3.client('s3')
+    def __init__(self, debug=False, endpoint_url=None):
+        self.boto = boto3.client('s3', endpoint_url=endpoint_url)
         self.path_cache = {}
 
     def clear_cache(self):

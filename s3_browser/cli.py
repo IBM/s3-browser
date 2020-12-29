@@ -39,6 +39,7 @@ class Cli(object):
     def __init__(
         self,
         working_dir=None,
+        endpoint_url=None,
         ps1=None,
         history_file=None,
         bookmark_file=None
@@ -47,7 +48,7 @@ class Cli(object):
         self.ps1 = ps1 or Cli.DEFAULT_PS1
         self.current_path = paths.S3Path.from_path(working_dir or '/')
 
-        self.client = client.S3Client()
+        self.client = client.S3Client(endpoint_url=endpoint_url)
 
         if bookmark_file:
             self.bookmarks = bookmarks.BookmarkManager(bookmark_file)
@@ -298,6 +299,12 @@ def configure_debug_logging():
 def main():
     parser = argparse.ArgumentParser('s3-browser')
     parser.add_argument(
+        '-e', '--endpoint', dest='endpoint_url', type=str, default=None,
+        help=(
+            'Optional endpoint URL in the form http[s]://server[:port]'
+        )
+    )
+    parser.add_argument(
         '-p', '--prompt', dest='prompt', type=str, default=None,
         help=(
             'Prompt string to use; use the special patterns {path}, '
@@ -329,6 +336,7 @@ def main():
 
     Cli(
         working_dir=args.working_dir,
+        endpoint_url=args.endpoint_url,
         ps1=args.prompt,
         history_file=args.history_file,
         bookmark_file=args.bookmark_file
