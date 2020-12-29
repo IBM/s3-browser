@@ -41,11 +41,13 @@ class Cli(object):
         working_dir=None,
         endpoint_url=None,
         ps1=None,
+        list_output=False,
         history_file=None,
         bookmark_file=None
     ):
         self.history_file = history_file
         self.ps1 = ps1 or Cli.DEFAULT_PS1
+        self.list_output = list_output
         self.current_path = paths.S3Path.from_path(working_dir or '/')
 
         self.client = client.S3Client(endpoint_url=endpoint_url)
@@ -109,7 +111,11 @@ class Cli(object):
             for r in results
         ]
 
-        utils.print_grid(results)
+        if self.list_output:
+            for e in results:
+                print(e)
+        else:
+            utils.print_grid(results)
 
     def add_bookmark(self, name, path):
         name = bookmarks.BookmarkManager.clean_key(name)
@@ -312,6 +318,12 @@ def main():
         )
     )
     parser.add_argument(
+        '-l', '--list', dest='list_output', action='store_true', default=False,
+        help=(
+            'Show results as a single column instead of a grid'
+        )
+    )
+    parser.add_argument(
         '--bookmarks', dest='bookmark_file', type=str,
         default='{}/.s3_browser_bookmarks'.format(
             os.environ.get('HOME', '/etc')
@@ -338,6 +350,7 @@ def main():
         working_dir=args.working_dir,
         endpoint_url=args.endpoint_url,
         ps1=args.prompt,
+        list_output=args.list_output,
         history_file=args.history_file,
         bookmark_file=args.bookmark_file
     ).read_loop()
